@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login – FaceVault</title>
+  <meta name="description" content="Sign in to your FaceVault account to access your AI-organized photo library." />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body { display:flex; align-items:center; justify-content:center; min-height:100vh; padding:20px; }
+    .auth-wrapper { width:100%; max-width:460px; position:relative; z-index:1; }
+    .auth-logo { text-align:center; margin-bottom:36px; }
+    .auth-logo a { display:inline-flex; align-items:center; gap:10px; font-size:1.5rem; font-weight:800; color:var(--text-primary); text-decoration:none; }
+    .auth-logo .logo-icon { width:42px; height:42px; border-radius:12px; background:linear-gradient(135deg,var(--accent),var(--cyan)); display:flex; align-items:center; justify-content:center; font-size:1.3rem; }
+    .auth-card { padding:40px; }
+    .auth-title { font-size:1.7rem; font-weight:800; margin-bottom:6px; }
+    .auth-sub { color:var(--text-secondary); font-size:0.9rem; margin-bottom:32px; }
+    .auth-form { display:flex; flex-direction:column; gap:20px; }
+    .password-wrapper { position:relative; }
+    .password-wrapper .form-input { padding-right:46px; width:100%; }
+    .toggle-pass { position:absolute; right:14px; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:1rem; }
+    .toggle-pass:hover { color:var(--text-primary); }
+    .form-footer { display:flex; align-items:center; justify-content:space-between; }
+    .remember-me { display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.88rem; color:var(--text-secondary); }
+    .remember-me input { accent-color:var(--accent); width:16px; height:16px; }
+    .forgot-link { color:var(--accent-light); text-decoration:none; font-size:0.88rem; }
+    .forgot-link:hover { text-decoration:underline; }
+    .auth-divider { display:flex; align-items:center; gap:16px; color:var(--text-muted); font-size:0.85rem; }
+    .auth-divider::before, .auth-divider::after { content:''; flex:1; height:1px; background:var(--border); }
+    .social-btns { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .social-btn { display:flex; align-items:center; justify-content:center; gap:8px; padding:11px; border-radius:10px; background:var(--bg-card); border:1px solid var(--border); color:var(--text-secondary); cursor:pointer; font-size:0.88rem; font-weight:500; transition:all 0.2s; font-family:inherit; }
+    .social-btn:hover { background:var(--bg-card-hover); color:var(--text-primary); }
+    .auth-switch { text-align:center; color:var(--text-secondary); font-size:0.88rem; margin-top:24px; }
+    .auth-switch a { color:var(--accent-light); text-decoration:none; font-weight:600; }
+    .auth-switch a:hover { text-decoration:underline; }
+    .input-icon-wrapper { position:relative; }
+    .input-icon-wrapper .form-input { padding-left:42px; width:100%; }
+    .input-icon { position:absolute; left:14px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-size:1rem; }
+    .error-msg { color:var(--danger); font-size:0.82rem; display:none; }
+    .error-msg.show { display:block; }
+    .btn-submit { width:100%; justify-content:center; padding:14px; font-size:1rem; }
+    .spinner { width:18px; height:18px; border:2px solid rgba(255,255,255,0.3); border-top-color:#fff; border-radius:50%; animation:spin 0.7s linear infinite; display:none; }
+  </style>
+</head>
+<body>
+  <div class="bg-orb bg-orb-1"></div>
+  <div class="bg-orb bg-orb-2"></div>
+
+  <div class="auth-wrapper fade-up">
+    <div class="auth-logo">
+      <a href="index.html">
+        <div class="logo-icon">🔍</div>
+        FaceVault
+      </a>
+    </div>
+
+    <div class="card auth-card">
+      <h1 class="auth-title">Welcome back</h1>
+      <p class="auth-sub">Sign in to continue to your photo library</p>
+
+      <form class="auth-form" id="loginForm" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="email">Email Address</label>
+          <div class="input-icon-wrapper">
+            <span class="input-icon">✉️</span>
+            <input type="email" id="email" class="form-input" placeholder="you@example.com" autocomplete="email" />
+          </div>
+          <span class="error-msg" id="emailError">Please enter a valid email address.</span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <div class="password-wrapper">
+            <input type="password" id="password" class="form-input" placeholder="Enter your password" autocomplete="current-password" />
+            <button type="button" class="toggle-pass" id="togglePass" title="Show/hide password">👁</button>
+          </div>
+          <span class="error-msg" id="passError">Password is required.</span>
+        </div>
+
+        <div class="form-footer">
+          <label class="remember-me">
+            <input type="checkbox" id="rememberMe" /> Remember me
+          </label>
+          <a href="#" class="forgot-link">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-submit" id="loginBtn">
+          <div class="spinner" id="loginSpinner"></div>
+          <span id="loginText">Sign In →</span>
+        </button>
+
+        <div id="loginError" class="error-msg" style="text-align:center;font-size:0.88rem;"></div>
+      </form>
+
+      <div class="divider"></div>
+
+      <div class="auth-divider">or continue with</div>
+      <div class="social-btns" style="margin-top:16px;">
+        <button class="social-btn">🌐 Google</button>
+        <button class="social-btn">🐙 GitHub</button>
+      </div>
+    </div>
+
+    <div class="auth-switch">
+      Don't have an account? <a href="register.html">Create one free →</a>
+    </div>
+  </div>
+
+  <script>
+    // Toggle password visibility
+    document.getElementById('togglePass').addEventListener('click', () => {
+      const p = document.getElementById('password');
+      const btn = document.getElementById('togglePass');
+      p.type = p.type === 'password' ? 'text' : 'password';
+      btn.textContent = p.type === 'password' ? '👁' : '🙈';
+    });
+
+    // Form submission
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      const pass = document.getElementById('password').value;
+      let valid = true;
+
+      document.querySelectorAll('.error-msg').forEach(el => el.classList.remove('show'));
+
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        document.getElementById('emailError').classList.add('show'); valid = false;
+      }
+      if (!pass) {
+        document.getElementById('passError').classList.add('show'); valid = false;
+      }
+      if (!valid) return;
+
+      const btn = document.getElementById('loginBtn');
+      const spinner = document.getElementById('loginSpinner');
+      const txt = document.getElementById('loginText');
+      btn.disabled = true; spinner.style.display = 'block'; txt.textContent = 'Signing in…';
+
+      // Simulate API call
+      await new Promise(r => setTimeout(r, 1500));
+
+      // On success → redirect to dashboard
+      window.location.href = 'dashboard.html';
+    });
+  </script>
+</body>
+</html>
