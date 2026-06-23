@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4 align-items-center">
+    <div class="col-md-8">
+        <h2 class="fw-bold mb-0">
+            {% if not shared %}
+                <a href="{{ url_for('dashboard') }}" class="text-muted text-decoration-none me-2"><i class="fa-solid fa-arrow-left"></i></a>
+            {% endif %}
+            {{ person.name }}'s Photos
+        </h2>
+        <p class="text-muted mt-2">{{ person.faces|length }} total images found.</p>
+    </div>
+    {% if not shared %}
+    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+        <button class="btn btn-outline-primary rounded-pill shadow-sm" onclick="copyToClipboard('{{ url_for('shared_folder', token=person.share_token, _external=True) }}')">
+            <i class="fa-solid fa-link me-2"></i>Copy Share Link
+        </button>
+    </div>
+    {% endif %}
+</div>
+
+<div class="row g-4">
+    {% for face in person.faces %}
+        <div class="col-6 col-md-4 col-lg-3">
+            <div class="card photo-item border-0 shadow-sm rounded-4 h-100">
+                <a href="{{ url_for('static', filename='uploads/' ~ face.photo.filename) }}" target="_blank">
+                    <img src="{{ url_for('static', filename='uploads/' ~ face.photo.filename) }}" class="card-img-top rounded-4" alt="Photo containing {{ person.name }}">
+                </a>
+            </div>
+        </div>
+    {% else %}
+        <div class="col-12 text-center py-5">
+            <h5 class="text-muted">No photos found for this person.</h5>
+        </div>
+    {% endfor %}
+</div>
+
+{% if not shared %}
+<script>
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(function() {
+            alert('Share link copied to clipboard!');
+        }, function(err) {
+            console.error('Could not copy text: ', err);
+        });
+    }
+</script>
+{% endif %}
+{% endblock %}

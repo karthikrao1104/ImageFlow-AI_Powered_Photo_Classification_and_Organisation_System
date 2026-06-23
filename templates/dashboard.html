@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="card glass-card border-0 shadow-sm rounded-4">
+            <div class="card-body p-4 text-center">
+                <h3 class="fw-bold mb-4">Upload Photos</h3>
+                <form action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data" id="upload-form">
+                    <div class="upload-zone mx-auto mb-3" style="max-width: 600px;">
+                        <i class="fa-solid fa-cloud-arrow-up fa-3x text-primary mb-3"></i>
+                        <h5 class="fw-bold">Drag & Drop Photos Here</h5>
+                        <p class="text-muted small">or click to browse from your device</p>
+                        <input class="d-none" type="file" id="photo-upload" name="photos" multiple accept="image/*" required>
+                    </div>
+                    <p id="file-count-text" class="text-success fw-bold d-none"></p>
+                    <div class="progress mt-3 d-none" id="upload-progress-container" style="height: 25px; border-radius: 20px;">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" id="upload-progress" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                    </div>
+                    <p id="upload-status" class="text-muted mt-2 d-none small fw-bold"></p>
+                    <button type="submit" class="btn btn-primary rounded-pill px-5 py-2 mt-3 shadow-sm fw-bold">
+                        <i class="fa-solid fa-upload me-2"></i>Upload & Process
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 mb-4">
+        <h3 class="fw-bold"><i class="fa-solid fa-folder-tree text-primary me-2"></i>Your People Folders</h3>
+        <hr>
+    </div>
+</div>
+
+<div class="row g-4">
+    {% for person in persons %}
+        <div class="col-md-4 col-lg-3">
+            <div class="card person-folder glass-card border-0 rounded-4 shadow-sm h-100">
+                <a href="{{ url_for('view_person', person_id=person.id) }}" class="text-decoration-none text-dark d-block">
+                    {% if person.thumbnail %}
+                        <img src="{{ url_for('static', filename='faces/' ~ person.thumbnail) }}" class="card-img-top rounded-top-4" alt="Person thumbnail">
+                    {% else %}
+                        <div class="bg-secondary rounded-top-4 d-flex align-items-center justify-content-center text-white" style="height: 200px;">
+                            <i class="fa-solid fa-user fa-4x"></i>
+                        </div>
+                    {% endif %}
+                </a>
+                <div class="card-body text-center d-flex flex-column justify-content-between">
+                    <div>
+                        <h5 class="card-title fw-bold mb-0">{{ person.name }}</h5>
+                        <small class="text-muted">{{ person.faces|length }} Photos</small>
+                    </div>
+                    <div class="mt-3">
+                        <button class="btn btn-sm btn-outline-secondary rounded-pill me-1" data-bs-toggle="modal" data-bs-target="#renameModal{{ person.id }}">
+                            <i class="fa-solid fa-pen"></i> Rename
+                        </button>
+                        <button class="btn btn-sm btn-outline-primary rounded-pill me-1" onclick="copyToClipboard('{{ url_for('shared_folder', token=person.share_token, _external=True) }}')">
+                            <i class="fa-solid fa-share-nodes"></i> Share
+                        </button>
+                        <form action="{{ url_for('delete_person', person_id=person.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this folder?');">
+                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill" title="Delete folder">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rename Modal -->
+        <div class="modal fade" id="renameModal{{ person.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content glass-card rounded-4 border-0 shadow">
+                    <div class="modal-header border-0 pb-0">
+                        <h5 class="modal-title fw-bold">Rename Folder</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="{{ url_for('rename_person', person_id=person.id) }}" method="POST">
+                            <div class="mb-3">
+                                <input type="text" class="form-control rounded-pill px-4" name="new_name" value="{{ person.name }}" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100 rounded-pill fw-bold">Save changes</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="col-12 text-center py-5">
+            <div class="text-muted">
+                <i class="fa-solid fa-folder-open fa-4x mb-3 text-secondary opacity-50"></i>
+                <h4>No folders yet</h4>
+                <p>Upload photos to let AI automatically organize them into folders.</p>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<script>
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(function() {
+            alert('Share link copied to clipboard!');
+        }, function(err) {
+            console.error('Could not copy text: ', err);
+        });
+    }
+</script>
+{% endblock %}

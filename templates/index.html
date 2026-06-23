@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="row align-items-center min-vh-75 text-center text-md-start my-5">
+    <div class="col-md-6 mb-5 mb-md-0">
+        <h1 class="display-3 fw-bolder mb-3 gradient-text">Organize Memories<br>With AI</h1>
+        <p class="lead text-muted mb-4 fs-4">Automatically classify and sort your photos by the people in them using advanced Face Recognition technology.</p>
+        <div>
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg rounded-pill px-5 py-3 shadow">Go to Dashboard</a>
+            {% else %}
+                <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg rounded-pill px-5 py-3 shadow">Get Started Free</a>
+                <a href="{{ url_for('login') }}" class="btn btn-outline-secondary btn-lg rounded-pill px-5 py-3 ms-md-3 mt-3 mt-md-0">Log In</a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="hero-image-placeholder rounded-4 shadow-lg p-5 bg-gradient d-flex align-items-center justify-content-center" style="min-height: 400px; background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);">
+            <i class="fa-solid fa-users-viewfinder fa-6x text-white opacity-75 drop-shadow"></i>
+        </div>
+    </div>
+</div>
+
+<!-- About Section -->
+<div id="about" class="py-5 my-5 bg-light rounded-5 p-5 shadow-sm">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold">How It Works</h2>
+        <p class="text-muted">Smart classification in three simple steps</p>
+    </div>
+    <div class="row g-4">
+        <div class="col-md-4 text-center">
+            <div class="feature-icon-wrapper mb-3 mx-auto shadow-sm">
+                <i class="fa-solid fa-cloud-arrow-up fs-2 text-primary"></i>
+            </div>
+            <h4 class="fw-bold">1. Upload Photos</h4>
+            <p class="text-muted">Upload your messy collection of group photos and portraits directly from any device.</p>
+        </div>
+        <div class="col-md-4 text-center">
+            <div class="feature-icon-wrapper mb-3 mx-auto shadow-sm">
+                <i class="fa-solid fa-microchip fs-2 text-primary"></i>
+            </div>
+            <h4 class="fw-bold">2. AI Processing</h4>
+            <p class="text-muted">Our ML model detects faces and smartly groups the same individuals across all your images.</p>
+        </div>
+        <div class="col-md-4 text-center">
+            <div class="feature-icon-wrapper mb-3 mx-auto shadow-sm">
+                <i class="fa-solid fa-folder-tree fs-2 text-primary"></i>
+            </div>
+            <h4 class="fw-bold">3. Auto-Organized</h4>
+            <p class="text-muted">Access beautifully organized folders for each person. Rename, share, or download them instantly.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Contact Section -->
+<div id="contact" class="py-5 mb-5 text-center">
+    <h2 class="fw-bold mb-4">Get in Touch</h2>
+    <p class="lead text-muted mb-5">Have questions or need support? Reach out to us.</p>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card glass-card border-0 shadow-sm rounded-4">
+                <div class="card-body p-4">
+                    <form>
+                        <div class="mb-3">
+                            <input type="text" class="form-control rounded-pill px-4" placeholder="Your Name">
+                        </div>
+                        <div class="mb-3">
+                            <input type="email" class="form-control rounded-pill px-4" placeholder="Your Email">
+                        </div>
+                        <div class="mb-3">
+                            <textarea class="form-control rounded-4 px-4 py-3" rows="4" placeholder="Your Message"></textarea>
+                        </div>
+                        <button type="button" class="btn btn-primary w-100 rounded-pill py-2 fw-bold">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
