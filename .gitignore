@@ -6,6 +6,10 @@ __pycache__/
 .env
 .vscode/
 .idea/
+instance/
+*.db
+*.sqlite
+*.sqlite3
 static/uploads/*
 !static/uploads/.gitkeep
 static/faces/*
