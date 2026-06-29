@@ -1,4 +1,4 @@
-# AI-Powered Photo Classification and Management System
+#Image Flow - AI Powered Photo Classification and Management System
 
 This is a full-stack web application that allows users to upload messy collections of photos, and uses advanced Machine Learning (Face Recognition) to automatically detect, crop, and categorize the photos into individual folders for each person.
 
