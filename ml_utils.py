@@ -23,10 +23,11 @@ def process_uploaded_image(photo, app):
         
     # Find all face locations and encodings in the image
     # Upsample the image 2 times to find smaller faces (increases precision/recall)
-    face_locations = face_recognition.face_locations(image, number_of_times_to_upsample=2, model='hog')
+    # Note: If accuracy is still an issue and you don't mind slower processing, change model='hog' to model='cnn'
+    face_locations = face_recognition.face_locations(image, number_of_times_to_upsample=2, model='cnn')
     
-    # Use num_jitters=5 to calculate the face encoding 5 times and average it (significantly increases accuracy)
-    face_encodings = face_recognition.face_encodings(image, face_locations, num_jitters=5)
+    # Use num_jitters=10 to calculate the face encoding 10 times and average it (significantly increases accuracy at the cost of processing time)
+    face_encodings = face_recognition.face_encodings(image, face_locations, num_jitters=10)
     
     # Get all existing persons for this user
     existing_persons = Person.query.filter_by(user_id=photo.user_id).all()
@@ -52,8 +53,9 @@ def process_uploaded_image(photo, app):
         matched_person_id = None
         
         if len(known_encodings) > 0:
-            # Compare face with known encodings using a balanced tolerance
-            matches = face_recognition.compare_faces(known_encodings, face_encoding, tolerance=0.55)
+            # Compare face with known encodings using a stricter tolerance (default is 0.6, was 0.55, now 0.48)
+            # A lower number makes face comparisons more strict, reducing false positives (mixing up people)
+            matches = face_recognition.compare_faces(known_encodings, face_encoding, tolerance=0.48)
             face_distances = face_recognition.face_distance(known_encodings, face_encoding)
             
             if True in matches:

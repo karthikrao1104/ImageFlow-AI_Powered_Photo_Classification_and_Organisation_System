@@ -37,6 +37,16 @@ with app.app_context():
 def index():
     return render_template('index.html')
 
+@app.route('/contact', methods=['POST'])
+def contact():
+    name = request.form.get('name')
+    email = request.form.get('email')
+    message = request.form.get('message')
+    
+    # In a real app, you would send an email or save to a database here.
+    flash(f"Thank you {name}, your message has been received! We'll get back to you shortly.", "success")
+    return redirect(url_for('index') + '#contact')
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:

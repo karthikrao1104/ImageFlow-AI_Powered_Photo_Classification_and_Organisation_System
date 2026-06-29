@@ -1,0 +1,23 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Flask Example</title>
+</head>
+<body>
+    <h1>Welcome to Flask!</h1>
+    <p>This is the home page. <a href="/greet/ColabUser">Greet Me!</a></p>
+    
+    <h2>Submit Your Name</h2>
+    <form action="/submit" method="POST">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="user_name" required>
+        <input type="submit" value="Submit">
+    </form>
+    
+    {% if submitted_name %}
+        <p>Hello, {{ submitted_name }}!</p>
+    {% endif %}
+
+</body>
+</html>
