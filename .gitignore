@@ -1,1 +1,12 @@
 db
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+.env
+.vscode/
+.idea/
+static/uploads/*
+!static/uploads/.gitkeep
+static/faces/*
+!static/faces/.gitkeep
