@@ -14,3 +14,6 @@ static/uploads/*
 !static/uploads/.gitkeep
 static/faces/*
 !static/faces/.gitkeep
+app.log
+database.db
+person.jpg

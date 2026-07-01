@@ -6,7 +6,26 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from database import db, User, Photo, Person, Face
 import uuid
 import threading
+import time
+import logging
+import warnings
+
+# Suppress the pkg_resources warning caused by face_recognition_models
+warnings.filterwarnings("ignore", category=UserWarning, message=".*pkg_resources is deprecated as an API.*")
+
 from ml_utils import process_uploaded_image
+
+logging.basicConfig(
+    filename='app.log',
+    level=logging.INFO,
+    format='%(asctime)s [%(levelname)s] %(name)s: %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+# Suppress werkzeug default logger to avoid duplicate logs
+logging.getLogger('werkzeug').setLevel(logging.WARNING)
+
+gateway_logger = logging.getLogger('com.api.gateway.filters.PreAuthFilter')
+login_logger = logging.getLogger('com.iam.engine.auth.LoginController')
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_super_secret_key_change_in_production'
@@ -32,6 +51,18 @@ def load_user(user_id):
 # Initialize database tables
 with app.app_context():
     db.create_all()
+
+@app.before_request
+def before_request():
+    request.start_time = time.time()
+    gateway_logger.info(f"Request received URI={request.path} method={request.method} client_ip={request.remote_addr}")
+
+@app.after_request
+def after_request(response):
+    if hasattr(request, 'start_time'):
+        duration = int((time.time() - request.start_time) * 1000)
+        gateway_logger.info(f"Request completed status={response.status_code} duration={duration}ms")
+    return response
 
 @app.route('/')
 def index():
@@ -94,6 +125,7 @@ def login():
         user = User.query.filter_by(email=email).first()
         
         if not user or not check_password_hash(user.password_hash, password):
+            login_logger.error(f"AUTH_FAILURE method=PASSWORD user={email} status=INVALID_CREDENTIALS client_ip={request.remote_addr}")
             flash('Please check your login details and try again.')
             return redirect(url_for('login'))
             
@@ -220,5 +252,39 @@ def delete_person(person_id):
     
     return redirect(url_for('dashboard'))
 
+@app.route('/photo/<int:photo_id>/delete', methods=['POST'])
+@login_required
+def delete_photo(photo_id):
+    photo = Photo.query.get_or_404(photo_id)
+    if photo.user_id != current_user.id:
+        abort(403)
+        
+    # Remove original uploaded image
+    photo_path = os.path.join(app.config['UPLOAD_FOLDER'], photo.filename)
+    if os.path.exists(photo_path):
+        try:
+            os.remove(photo_path)
+        except Exception as e:
+            print(f"Error removing file {photo_path}: {e}")
+            
+    # Delete face thumbnails for ALL faces in this photo
+    for face in photo.faces:
+        face_path = os.path.join(app.config['FACES_FOLDER'], face.face_filename)
+        if os.path.exists(face_path):
+            try:
+                os.remove(face_path)
+            except Exception as e:
+                print(f"Error removing face file {face_path}: {e}")
+                
+    db.session.delete(photo)
+    db.session.commit()
+    flash('Photo deleted successfully.')
+    
+    return redirect(request.referrer or url_for('dashboard'))
+
 if __name__ == '__main__':
+    print("\n" + "=" * 50)
+    print(" Server is successfully running!")
+    print(" Open your browser and go to: http://127.0.0.1:5000/")
+    print("=" * 50 + "\n")
     app.run(debug=True)

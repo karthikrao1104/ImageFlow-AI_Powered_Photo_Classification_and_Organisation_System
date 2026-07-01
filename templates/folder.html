@@ -23,10 +23,17 @@
 <div class="row g-4">
     {% for face in person.faces %}
         <div class="col-6 col-md-4 col-lg-3">
-            <div class="card photo-item border-0 shadow-sm rounded-4 h-100">
+            <div class="card photo-item border-0 shadow-sm rounded-4 h-100 position-relative">
                 <a href="{{ url_for('static', filename='uploads/' ~ face.photo.filename) }}" target="_blank">
                     <img src="{{ url_for('static', filename='uploads/' ~ face.photo.filename) }}" class="card-img-top rounded-4" alt="Photo containing {{ person.name }}">
                 </a>
+                {% if not shared %}
+                <form action="{{ url_for('delete_photo', photo_id=face.photo.id) }}" method="POST" class="position-absolute top-0 end-0 p-2 m-1" onsubmit="return confirm('Are you sure you want to delete this photo?');">
+                    <button type="submit" class="btn btn-danger btn-sm rounded-circle shadow" title="Delete Photo" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </form>
+                {% endif %}
             </div>
         </div>
     {% else %}
